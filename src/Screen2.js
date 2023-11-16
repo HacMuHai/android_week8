@@ -3,14 +3,9 @@ import { StyleSheet, View, Text, TouchableOpacity, Image, SafeAreaView, } from '
 import { TextInput } from "react-native-web";
 
 export default function App({ navigation }) {
-    var listAccount = [
-        { name: "user1", password: "pw1" },
-        { name: "user2", password: "pw2" },
-        { name: "user3", password: "pw3" }
-    ]
     const [showPassWord, setShowPassWord] = useState(true)
     const [checkAccount, setCheckAcount] = useState(true)
-    const tbLoi = 'Name already exists'
+    const [tbLoi, setTbLoi] = useState('')
 
     const [pathEye, setPathEye] = useState(require('../assets/eye.png'))
 
@@ -26,21 +21,51 @@ export default function App({ navigation }) {
 
     const URL_BASE = 'https://js27h4-3000.csb.app'
     const pressRegister = () => {
-        fetch(`${URL_BASE}/accounts?name=${name}`)
-            .then(response => response.json())
-            .then(
-                data => {
-                    if (data.length != 0) {
-                        console.log('a');
-                       
-                    } else
-                        console.log('b');
-                        if (checkAccount) {
-                            setCheckAcount(false)
+        if (name.trim() == '') {
+            setTbLoi('Name empty')
+            if (checkAccount) {
+                setCheckAcount(false)
+            }
+        } else if (password.trim() == '') {
+            setTbLoi('Password empty')
+            if (checkAccount) {
+                setCheckAcount(false)
+            }
+        } else if (email.trim() == '') {
+            setTbLoi('Email empty')
+            if (checkAccount) {
+                setCheckAcount(false)
+            }
+        } else {
+            fetch(`${URL_BASE}/accounts?name=${name}`)
+                .then(response => response.json())
+                .then(
+                    data => {
+                        if (data.length != 0) {
+                            setTbLoi('Name exists')
+                            if (checkAccount) {
+                                setCheckAcount(false)
+                            }
+                        } else {
+                            fetch(`${URL_BASE}/accounts`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    name: name,
+                                    password: password,
+                                    email: email
+                                })
+                            })
+                                .then(response => response.json())
+                                .then(newAccount => {
+                                    navigation.push('Screen3', { user: newAccount });
+                                })
                         }
-                    // navigation.push('Screen3', { user: data[0] })
-                }
-            )
+                    }
+                )
+        }
 
     }
     return (

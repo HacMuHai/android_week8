@@ -1,41 +1,49 @@
 import React, { useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, Image, SafeAreaView, } from 'react-native';
-import { TextInput } from "react-native-web";
+import { TextInput } from "react-native";
 
 export default function App({ navigation }) {
-    var listAccount = [
-        { name: "user1", password: "pw1" },
-        { name: "user2", password: "pw2" },
-        { name: "user3", password: "pw3" }
-    ]
+
     const [pathEye, setPathEye] = useState(require('../assets/eye.png'))
     const [name, setName] = useState('');
     const [password, setPassword] = useState('');
-    const [checkAccount,setCheckAcount]=useState(true)
+    const [checkAccount, setCheckAcount] = useState(true)
     const [showPassWord, setShowPassWord] = useState(true)
-    const tbLoi ='Name or password fail'
+    const [tbLoi,setTbLoi] = useState('')
     const changeEye = () => {
         setPathEye(!showPassWord ? require('../assets/eye.png') : require('../assets/notEye.png'))
         setShowPassWord(!showPassWord)
     }
 
     const URL_BASE = 'https://js27h4-3000.csb.app'
-    const pressLogin = () => {
-        fetch(`${URL_BASE}/accounts?name=${name}&password=${password}`)
-            .then(response => response.json())
-            .then(
-                data => {
-                    if (data.length == 0) {
-                        console.log('a');
-                        if(checkAccount){
-                            setCheckAcount(false)
-                        }
-                    } else
-                    console.log('b');
-                    // navigation.push('Screen3', { user: data[0] })
-                }
-            )
 
+    const pressLogin = () => {
+        if (name.trim() == '') {
+            setTbLoi('Name empty')
+            if (checkAccount) {
+                setCheckAcount(false)
+            }
+        } else if (password.trim() == '') {
+            setTbLoi('Password empty')
+            if (checkAccount) {
+                setCheckAcount(false)
+            }
+        } else {
+
+            fetch(`${URL_BASE}/accounts?name=${name}&password=${password}`)
+                .then(response => response.json())
+                .then(
+                    data => {
+                        if (data.length == 0) {
+                            setTbLoi('Name or password fail')
+                            if (checkAccount) {
+                                setCheckAcount(false)
+                            }
+                        } else
+                            navigation.push('Screen3', { user: data[0] })
+                    }
+                )
+        }
     }
     return (
         <View style={{ flex: 1, padding: 10, width: '100%' }}>
@@ -44,10 +52,10 @@ export default function App({ navigation }) {
             </View>
 
             <SafeAreaView style={{ flex: 3, width: '100%', justifyContent: 'space-around' }}>
-                <View style={[{ height: 40, justifyContent: 'center', borderRadius: 5, paddingHorizontal: 5, borderColor: 'red' },checkAccount?null:{borderWidth:1,borderLeftWidth:5}]}>
-                    <Text style={{ fontSize: 16, fontWeight: 700, }}>{checkAccount?'':tbLoi}</Text>
+                <View style={[{ height: 40, justifyContent: 'center', borderRadius: 5, paddingHorizontal: 5, borderColor: 'red' }, checkAccount ? null : { borderWidth: 1, borderLeftWidth: 5 }]}>
+                    <Text style={{ fontSize: 16, fontWeight: 700, }}>{checkAccount ? '' : tbLoi}</Text>
                 </View>
-                <View style={{ height: 50, flexDirection: 'row', borderWidth: 1,borderLeftWidth:5, borderRadius: 5, paddingHorizontal: 5, borderColor: '#00BDD6' }}>
+                <View style={{ height: 50, flexDirection: 'row', borderWidth: 1, borderLeftWidth: 5, borderRadius: 5, paddingHorizontal: 5, borderColor: '#00BDD6' }}>
                     <Image style={{ flex: 1, resizeMode: 'contain' }} source={require('../assets/user.png')} />
                     <TextInput
                         placeholder='Name'
@@ -58,7 +66,7 @@ export default function App({ navigation }) {
                         }
                     />
                 </View>
-                <View style={{ height: 50, flexDirection: 'row', borderWidth: 1,borderLeftWidth:5, borderRadius: 5, paddingHorizontal: 5, borderColor: '#00BDD6' }}>
+                <View style={{ height: 50, flexDirection: 'row', borderWidth: 1, borderLeftWidth: 5, borderRadius: 5, paddingHorizontal: 5, borderColor: '#00BDD6' }}>
                     <Image style={{ flex: 1, resizeMode: 'contain' }} source={require('../assets/lock.png')} />
                     <TextInput
                         placeholder='Password'
